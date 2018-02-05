@@ -11,4 +11,10 @@ import scrapy
 class ZhihuItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    username = scrapy.Field()
+    answer_count = scrapy.Field()
+    articles_count = scrapy.Field()
+    avatar_url = scrapy.Field()
+    follower_count = scrapy.Field()
+    url = scrapy.Field()
+    zhihu_id = scrapy.Field()
