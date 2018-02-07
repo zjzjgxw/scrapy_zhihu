@@ -26,7 +26,7 @@ class transCookie:
 class TravellerSpider(scrapy.Spider):
     name = 'traveller'
     allowed_domains = ['zhihu.com']
-    start_urls = ['https://www.zhihu.com/api/v4/topics/19551556/followers?offset=&limit=20&include=data%5B*%5D.gender%2Canswer_count%2Carticles_count%2Cfollower_count%2Cis_following%2Cis_followed']
+    start_urls = ['https://www.zhihu.com/api/v4/topics/19551556/followers?include=data%5B%2A%5D.gender%2Canswer_count%2Carticles_count%2Cfollower_count%2Cis_following%2Cis_followed&limit=20&offset=10020']
     cookies = COOKIES  # 带着Cookie向网页发请求
 
     def start_requests(self):
