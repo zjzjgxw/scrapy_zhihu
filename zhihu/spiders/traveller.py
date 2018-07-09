@@ -1,38 +1,56 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from zhihu.items import ZhihuItem
-from zhihu.settings import COOKIES
 import json
 
-
-class transCookie:
-    def __init__(self, cookie):
-        self.cookie = cookie
-
-    def stringToDict(self):
-        '''
-        将从浏览器上Copy来的cookie字符串转化为Scrapy能使用的Dict
-        :return:
-        '''
-        itemDict = {}
-        items = self.cookie.split(';')
-        for item in items:
-            key = item.split('=')[0].replace(' ', '')
-            value = item.split('=')[1]
-            itemDict[key] = value
-        return itemDict
+from scrapy.http.cookies import CookieJar    # 该模块继承自内置的http.cookiejar,操作类似
 
 
 class TravellerSpider(scrapy.Spider):
     name = 'traveller'
     allowed_domains = ['zhihu.com']
+    headers = {
+        'Host':
+            'www.zhihu.com',
+        'Connection':
+            'keep-alive',
+        'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+    }
+
+    cookie_jar = CookieJar()
+
+    loginUrl = 'https://www.zhihu.com/#signin'
+    siginUrl = 'https://www.zhihu.com/login/email'
+
     start_urls = ['https://www.zhihu.com/api/v4/topics/19551556/followers?include=data%5B%2A%5D.gender%2Canswer_count%2Carticles_count%2Cfollower_count%2Cis_following%2Cis_followed&limit=20&offset=10020']
-    cookies = COOKIES  # 带着Cookie向网页发请求
 
     def start_requests(self):
-        trans = transCookie(self.cookies)
-        cookies = trans.stringToDict()
-        yield scrapy.Request(url=self.start_urls[0], cookies=cookies)  # 这里带着cookie发出请求
+        return [
+            scrapy.http.FormRequest(
+                self.loginUrl,
+                headers=self.headers,
+                callback=self.post_login)
+        ]
+
+    def post_login(self, response):
+        self.cookie_jar.extract_cookies(response,response.request)
+        xsrf = response.xpath("//input[@name='_xsrf']/@value").extract_first()
+        self.headers['X-Xsrftoken'] = xsrf
+        return [
+            scrapy.http.FormRequest(
+                self.siginUrl,
+                method='POST',
+                headers=self.headers,
+                meta={'cookiejar': response.meta['cookiejar']},
+                formdata={
+                    '_xsrf': xsrf,
+                    'captcha_type': 'cn',
+                    'email': 'xxxxxx@163.com',
+                    'password': 'xxxxxx',
+                },
+                callback=self.after_login)
+        ]
 
     def parse(self, response):
         node_list = json.loads(response.body)['data']
