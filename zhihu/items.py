@@ -18,3 +18,20 @@ class ZhihuItem(scrapy.Item):
     follower_count = scrapy.Field()
     url = scrapy.Field()
     zhihu_id = scrapy.Field()
+
+
+class TripadvisorHotelItem(scrapy.Item):
+    # tripadvisor hotel item
+    code = scrapy.Field()
+    url = scrapy.Field()
+    name_cn = scrapy.Field()
+    name_en = scrapy.Field()
+    rate = scrapy.Field()
+    comment_num = scrapy.Field()
+    rank_describe = scrapy.Field()
+    img_url = scrapy.Field()
+    address = scrapy.Field()
+    phone = scrapy.Field()
+    hotel_url = scrapy.Field()
+    star = scrapy.Field()
+
