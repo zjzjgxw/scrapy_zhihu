@@ -6,7 +6,8 @@
 # https://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-
+import re
+from scrapy.contrib.loader.processor import Join, MapCompose, TakeFirst
 
 class ZhihuItem(scrapy.Item):
     # define the fields for your item here like:
@@ -20,18 +21,18 @@ class ZhihuItem(scrapy.Item):
     zhihu_id = scrapy.Field()
 
 
+def handle_rate(value):
+    tmp = re.search('\d', value).group()
+    return tmp
+
+
 class TripadvisorHotelItem(scrapy.Item):
     # tripadvisor hotel item
-    code = scrapy.Field()
-    url = scrapy.Field()
-    name_cn = scrapy.Field()
-    name_en = scrapy.Field()
-    rate = scrapy.Field()
-    comment_num = scrapy.Field()
-    rank_describe = scrapy.Field()
-    img_url = scrapy.Field()
-    address = scrapy.Field()
-    phone = scrapy.Field()
-    hotel_url = scrapy.Field()
-    star = scrapy.Field()
+    code = scrapy.Field(output_processor=TakeFirst())
+    url = scrapy.Field(output_processor=TakeFirst())
+    name_cn = scrapy.Field(output_processor=TakeFirst())
+    name_en = scrapy.Field(output_processor=TakeFirst())
+    rate = scrapy.Field(input_processor=MapCompose(handle_rate), output_processor=TakeFirst())
+    comment_num = scrapy.Field(output_processor=TakeFirst())
+    img_url = scrapy.Field(output_processor=TakeFirst())
 
